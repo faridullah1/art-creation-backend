@@ -6,6 +6,7 @@ const morgan = require('morgan');
 const userRouter = require('./routes/userRoutes');
 const creationRouter = require('./routes/creationRoutes');
 const sequelize = require('./db');
+const globalErrorHandler = require('./controllers/errorController');
 
 const Creation = require('./models/creationModel');
 const User = require('./models/userModel');
@@ -29,6 +30,8 @@ app.all('*', (req, res, next) => {
 		message: `Can't find ${req.originalUrl} on this server`
 	});
 });
+
+app.use(globalErrorHandler);
 
 User.hasMany(Creation, { constraints: true, OnDelete: 'CASECADE', foreignKey: 'userId'});
 Creation.belongsTo(User, { foreignKey: 'userId' });

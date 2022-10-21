@@ -42,14 +42,22 @@ exports.createPrediction = async (req, res, next) => {
 };
 
 exports.getAllCreations = async (req, res, next) => {
-	const creations = await Creation.findAll();
+	try {
+		const creations = await Creation.findAll();
 
-	res.status(200).json({
-		status: 'success',
-		data: {
-			creations
-		}
-	});
+		res.status(200).json({
+			status: 'success',
+			data: {
+				creations
+			}
+		});
+	}
+	catch(error) {
+		res.status(error.status).send({
+			status: 'fail',
+			message: error.message
+		});
+	}
 };
 
 exports.getPredictionsByUserId = async (req, res, next) => {

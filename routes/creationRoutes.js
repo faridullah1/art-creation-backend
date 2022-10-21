@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const creationController = require('../controllers/creationController');
+const { auth } = require('../middleware/auth');
 
 router.route('/')
-	.get(creationController.getAllCreations)
+	.get(auth, creationController.getAllCreations)
 	.post(creationController.createPrediction)
 
 router.route('/users/:id').get(creationController.getPredictionsByUserId);
