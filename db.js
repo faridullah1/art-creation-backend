@@ -1,5 +1,5 @@
 const Sequelize = require('sequelize');
-const connection = new Sequelize('ai_art', 'root', 'admin', {
+const connection = new Sequelize(process.env.DATABASE, process.env.DATABASE_USER, process.env.USER_PASSWORD, {
 	dialect: 'mysql',
 	host: 'localhost'
 });

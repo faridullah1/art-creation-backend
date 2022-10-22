@@ -5,7 +5,7 @@ exports.auth = async (req, res, next) => {
 	let token = '';
 
 	if (req.header('Authorization')) {
-		token = header.split(' ')[1];
+		token = req.header('Authorization').split(' ')[1];
 	}
 
 	if (!token) return res.status(401).send('Access denied. No token provided.');
