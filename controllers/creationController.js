@@ -23,11 +23,20 @@ exports.createPrediction = async (req, res, next) => {
 		// 	}
 		// );
 
+		const loggedInUser = await User.findOne({ where: { email: req.user.email }});
+
+		if (!loggedInUser) {
+			return res.status(401).json({
+				status: 'error',
+				message: 'No user one with given token'
+			});
+		}
+
 		const resp = await Creation.create({
 			prompt,
 			modelType,
 			outputImage: pictures[Math.floor(Math.random() * pictures.length)],
-			userId: 2
+			userId: loggedInUser.userId
 		});
 
 		res.status(201).json({
@@ -37,13 +46,17 @@ exports.createPrediction = async (req, res, next) => {
 			}
 		});
 	} catch(err) {
-		res.status(err.status).send(err);
+		res.status(500).send(err);
 	}
 };
 
 exports.getAllCreations = async (req, res, next) => {
 	try {
-		const creations = await Creation.findAll();
+		const status = req.query.status;
+		const where = {};
+		if (status !== 'Default') where.status = status;
+
+		const creations = await Creation.findAll({ where });
 
 		res.status(200).json({
 			status: 'success',
@@ -62,7 +75,6 @@ exports.getAllCreations = async (req, res, next) => {
 
 exports.getPredictionsByUserId = async (req, res, next) => {
 	const userId = +req.params.id;
-	console.log('User id =', userId)
 	const predictions = await Creation.findAll({ where: { userId }});
 
 	res.status(200).json({
@@ -72,3 +84,22 @@ exports.getPredictionsByUserId = async (req, res, next) => {
 		}
 	});
 };
+
+exports.publishCreation = async (req, res, next) => {
+	const { creationId, description } = req.body;
+
+	const creation = await Creation.findByPk(creationId);
+
+	creation.isPublished = true;
+	creation.status = 'Published';
+	creation.description = description;
+
+	creation.save();
+
+	res.status(200).json({
+		status: 'success',
+		data: {
+			creation
+		}
+	});
+}

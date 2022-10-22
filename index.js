@@ -1,18 +1,25 @@
+// 3rd party packages
 const express = require('express');
 const app = express();
 const dotenv = require('dotenv');
 const morgan = require('morgan');
 
+// Setup enviroment variables
+dotenv.config({ path: './config.env' });
+
+// All route Handlers
 const userRouter = require('./routes/userRoutes');
 const creationRouter = require('./routes/creationRoutes');
-const sequelize = require('./db');
 const globalErrorHandler = require('./controllers/errorController');
 
+// Db connection
+const sequelize = require('./db');
+
+// Models 
 const Creation = require('./models/creationModel');
 const User = require('./models/userModel');
 
-dotenv.config({ path: './config.env' });
-
+// setup middlewares
 app.use(express.json());
 app.use(morgan('dev'));
 

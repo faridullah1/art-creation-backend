@@ -16,7 +16,7 @@ exports.auth = async (req, res, next) => {
 			audience: process.env.CLIENT_ID,
 		});
 		const payload = ticket.getPayload();
-		req.user = payload.email;
+		req.user = payload;
 		next();
 	}
 	catch(err) {

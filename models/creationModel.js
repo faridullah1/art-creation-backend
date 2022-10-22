@@ -19,6 +19,19 @@ const User = db.define('creation', {
 	outputImage: {
 		type: Sequelize.STRING,
 		allowNull: false
+	},
+	isPublished: {
+		type: Sequelize.BOOLEAN,
+		defaultValue: false
+	},
+	status: {
+		type: Sequelize.ENUM('Default', 'Published', 'Archived'),
+		defaultValue: 'Default' 
+	},
+	description: Sequelize.STRING(255),
+	likes: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
 	}
 });
 

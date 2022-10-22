@@ -2,7 +2,15 @@ const User = require('../models/userModel');
 const db = require('../db');
 
 exports.createUser = async (req, res, next) => {
-	const { email, name } = req.body;
+	const { email, name } = req.user;
+	const user = await User.findOne({ where: { email }});
+	if (user) {
+		return res.status('403').json({
+			status: 'error',
+			message: 'User already exists'	
+		});
+	}
+
 	const resp = await User.create({
 		email, name
 	});
