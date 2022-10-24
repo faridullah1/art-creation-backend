@@ -1,5 +1,6 @@
 const superAgent = require('superagent');
 const Creation = require('../models/creationModel');
+const CreationComment = require('../models/creationComments');
 const User = require('../models/userModel');
 const db = require('../db');
 
@@ -56,7 +57,27 @@ exports.getAllCreations = async (req, res, next) => {
 		const where = {};
 		if (status !== 'Default') where.status = status;
 
-		const creations = await Creation.findAll({ where });
+		/* 
+			Get Creations with comments and user info
+			resp = [
+				{
+					...creationinfo
+					creation_comments: [
+						{ 
+							...commentInfo
+							user: { ...userInfo }
+						}
+					]
+					user: { ...userInfo }
+				}
+			]
+		*/
+		const creations = await Creation.findAll({ include: 
+			[ User, {
+				model: CreationComment,
+				include: User
+			}
+		]});
 
 		res.status(200).json({
 			status: 'success',

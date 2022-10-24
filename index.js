@@ -10,14 +10,12 @@ dotenv.config({ path: './config.env' });
 // All route Handlers
 const userRouter = require('./routes/userRoutes');
 const creationRouter = require('./routes/creationRoutes');
+const commentsRouter = require('./routes/commentsRoutes');
 const globalErrorHandler = require('./controllers/errorController');
+
 
 // Db connection
 const sequelize = require('./db');
-
-// Models 
-const Creation = require('./models/creationModel');
-const User = require('./models/userModel');
 
 // setup middlewares
 app.use(express.json());
@@ -29,6 +27,7 @@ app.get('/', (req, res) => {
 
 app.use('/api/users', userRouter);
 app.use('/api/creations', creationRouter);
+app.use('/api/comments', commentsRouter);
 
 // Handling unhandled routes
 app.all('*', (req, res, next) => {
@@ -40,11 +39,11 @@ app.all('*', (req, res, next) => {
 
 app.use(globalErrorHandler);
 
-User.hasMany(Creation, { constraints: true, OnDelete: 'CASECADE', foreignKey: 'userId'});
-Creation.belongsTo(User, { foreignKey: 'userId' });
+// Run the migration to populate database with the tables
+require('./migration.js')();
 
 sequelize.sync()
-	.then(result => {
+	.then(() => {
 		const port = process.env.PORT || 3000;
 		app.listen(port, () => {
 			console.log(`Server is listening on port ${port}`);

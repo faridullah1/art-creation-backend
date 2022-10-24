@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../db');
 
-const User = db.define('creation', {
+const Creation = db.define('creation', {
 	creationId: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
@@ -20,10 +20,6 @@ const User = db.define('creation', {
 		type: Sequelize.STRING,
 		allowNull: false
 	},
-	isPublished: {
-		type: Sequelize.BOOLEAN,
-		defaultValue: false
-	},
 	status: {
 		type: Sequelize.ENUM('Default', 'Published', 'Archived'),
 		defaultValue: 'Default' 
@@ -35,4 +31,4 @@ const User = db.define('creation', {
 	}
 });
 
-module.exports = User;
+module.exports = Creation;
