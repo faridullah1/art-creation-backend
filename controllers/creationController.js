@@ -111,7 +111,6 @@ exports.publishCreation = async (req, res, next) => {
 
 	const creation = await Creation.findByPk(creationId);
 
-	creation.isPublished = true;
 	creation.status = 'Published';
 	creation.description = description;
 
