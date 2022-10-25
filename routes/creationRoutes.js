@@ -3,16 +3,13 @@ const router = express.Router();
 const creationController = require('../controllers/creationController');
 const { auth } = require('../middleware/auth');
 
+router.use(auth);
+
 router.route('/')
-	.get(auth, creationController.getAllCreations)
-	.post(auth, creationController.createPrediction)
+	.get(creationController.getAllCreations)
+	.post(creationController.createPrediction)
 
-router.route('/users/:id').get(creationController.getPredictionsByUserId);
+router.route('/mine').get(creationController.getLoggedInUserCreations);
 router.route('/publish').post(creationController.publishCreation)
-
-// router.route('/:id')
-// 	.get(creationController.getUserById)
-// 	.put(creationController.updateUser)
-// 	.delete(creationController.deleteUser)
 
 module.exports = router;

@@ -5,14 +5,13 @@ exports.createComment = async (req, res, next) => {
 	try {
 		const { comment, creationId } = req.body;
 
-		const user = await User.findOne({ email: req.user.email });
+		const user = await User.findOne({ where: { email: req.user.email } });
 
 		const resp = await CreationComment.create({
 			comment,
 			creationId,
 			userId: user.userId,
 		});
-
 
 		const data = { ...resp['dataValues'], user };
 

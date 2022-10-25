@@ -52,7 +52,8 @@ exports.createPrediction = async (req, res, next) => {
 };
 
 exports.getAllCreations = async (req, res, next) => {
-	try {
+	try 
+	{
 		const status = req.query.status;
 		const where = {};
 		if (status !== 'Default') where.status = status;
@@ -72,12 +73,15 @@ exports.getAllCreations = async (req, res, next) => {
 				}
 			]
 		*/
-		const creations = await Creation.findAll({ include: 
-			[ User, {
-				model: CreationComment,
-				include: User
+		const creations = await Creation.findAll(
+			{ 
+				include: [User, {
+						model: CreationComment,
+						include: User
+					}
+				]
 			}
-		]});
+		);
 
 		res.status(200).json({
 			status: 'success',
@@ -87,21 +91,28 @@ exports.getAllCreations = async (req, res, next) => {
 		});
 	}
 	catch(error) {
-		res.status(error.status).send({
+		res.status(500).send({
 			status: 'fail',
 			message: error.message
 		});
 	}
 };
 
-exports.getPredictionsByUserId = async (req, res, next) => {
-	const userId = +req.params.id;
-	const predictions = await Creation.findAll({ where: { userId }});
+exports.getLoggedInUserCreations = async (req, res, next) => {
+	const status = req.query.status;
+	
+	const where = {};
+	if (status !== 'Default') where.status = status;
+
+	const user = await User.findOne({ where: { email: req.user.email } });
+	where.userId = user.userId
+
+	const creations = await Creation.findAll({ where });
 
 	res.status(200).json({
 		status: 'success',
 		data: {
-			predictions
+			creations
 		}
 	});
 };
