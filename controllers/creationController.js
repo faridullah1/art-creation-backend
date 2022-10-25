@@ -118,11 +118,12 @@ exports.getLoggedInUserCreations = async (req, res, next) => {
 };
 
 exports.publishCreation = async (req, res, next) => {
-	const { creationId, description } = req.body;
+	const { creationId, title, description } = req.body;
 
 	const creation = await Creation.findByPk(creationId);
 
 	creation.status = 'Published';
+	creation.prompt = title;
 	creation.description = description;
 
 	creation.save();
