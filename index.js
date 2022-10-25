@@ -14,13 +14,15 @@ const commentsRouter = require('./routes/commentsRoutes');
 const followerRouter = require('./routes/followerRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 
-
 // Db connection
 const sequelize = require('./db');
 
 // setup middlewares
 app.use(express.json());
-app.use(morgan('dev'));
+
+if (process.env.NODE_ENV === 'development') {
+	app.use(morgan('dev'));
+}
 
 app.get('/', (req, res) => {
 	res.send('Welcome to Night Cafe Clone App');
@@ -47,6 +49,7 @@ require('./migration.js')();
 sequelize.sync()
 	.then(() => {
 		const port = process.env.PORT || 3000;
+		
 		app.listen(port, () => {
 			console.log(`Server is listening on port ${port}`);
 		});
