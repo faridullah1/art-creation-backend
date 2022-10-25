@@ -9,6 +9,13 @@ exports.createFollower = async (req, res, next) => {
 
 		const { userId } = req.body;
 
+		if (userId === followedBy.userId) {
+			return res.status(400).json({
+				status: 'error',
+				message: 'You can not follow your self'
+			});
+		}
+
 		const resp = await Follower.create({
 			userId,
 			followById: followedBy.userId
@@ -27,14 +34,8 @@ exports.createFollower = async (req, res, next) => {
 
 exports.getFollowedByCreations = async (req, res, next) => {
 	try {
-		const loggedInUser = await User.findOne({ where: { email: req.user.email }});
-
-		const followers = await Follower.findAll({ 
-			where: { followById: loggedInUser.userId },
-			attributes: ['userId']
-		});
-
-		const followedUsersIds = followers.map(follower => follower.dataValues.userId)
+		const { email } = req.user;
+		const ids = await getFollowedUsersIds(email);
 
 		const creations = await Creation.findAll(
 			{ 
@@ -43,7 +44,7 @@ exports.getFollowedByCreations = async (req, res, next) => {
 						include: User
 					}
 				],
-				where: { userId: followedUsersIds }
+				where: { userId: ids }
 			}
 		);
 
@@ -57,3 +58,30 @@ exports.getFollowedByCreations = async (req, res, next) => {
 		res.status(500).send(err.message);
 	}
 };
+
+exports.getAllFollowedByUsers = async (req, res, next) => {
+	try {
+		const { email } = req.user;
+		const ids = await getFollowedUsersIds(email);
+
+		res.status(200).json({
+			status: 'success',
+			data: ids
+		});
+	} catch(err) {
+		res.status(500).send(err.message);
+	}
+};
+
+async function getFollowedUsersIds(email) {
+	const loggedInUser = await User.findOne({ where: { email }});
+
+	const followers = await Follower.findAll({ 
+		where: { followById: loggedInUser.userId },
+		attributes: ['userId']
+	});
+
+	const followedUsersIds = followers.map(follower => follower.dataValues.userId);
+
+	return followedUsersIds;
+}
