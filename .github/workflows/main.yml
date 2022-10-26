@@ -22,7 +22,7 @@ jobs:
         id: docker_meta
         uses: docker/metadata-action@v4.0.1
         with:
-          images: ghcr.io/faridullah1/art-generation # list of Docker images to use as base name for tags
+          images: ghcr.io/faridullah1/art-creation-backend # list of Docker images to use as base name for tags
           tag-sha: true
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2.0.0
