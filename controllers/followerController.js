@@ -2,6 +2,7 @@ const Follower = require('../models/followerModel');
 const User = require('../models/userModel');
 const Creation = require('../models/creationModel');
 const CreationComment = require('../models/creationComments');
+const CreationLike = require('../models/creationLikes');
 
 exports.createFollower = async (req, res, next) => {
 	try {
@@ -39,9 +40,15 @@ exports.getFollowedByCreations = async (req, res, next) => {
 
 		const creations = await Creation.findAll(
 			{ 
-				include: [User, {
+				include: [
+					User, 
+					{
 						model: CreationComment,
 						include: User
+					},
+					{
+						model: CreationLike,
+						attributes: ['userId', 'creationId']
 					}
 				],
 				where: { userId: ids }

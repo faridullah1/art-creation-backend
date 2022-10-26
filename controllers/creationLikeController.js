@@ -26,9 +26,6 @@ exports.likeCreation = async (req, res, next) => {
 exports.unLikeCreation = async (req, res, next) => {
 	try {
 		const { creationId, userId } = req.body;
-
-		console.log(creationId, userId);
-
 		await CreationLike.destroy({ where: { userId, creationId }});
 
 		res.status(204).json({
