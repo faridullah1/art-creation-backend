@@ -85,7 +85,7 @@ exports.getAllCreations = async (req, res, next) => {
 					},
 					{ 
 						model: CreationLike, 
-						attributes: ['userId', 'creationId'] 
+						attributes: ['userId', 'creationId']
 					}
 				]
 			}

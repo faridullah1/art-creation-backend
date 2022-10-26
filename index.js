@@ -13,6 +13,7 @@ const creationRouter = require('./routes/creationRoutes');
 const commentsRouter = require('./routes/commentsRoutes');
 const likesRouter = require('./routes/likesRoutes');
 const followerRouter = require('./routes/followerRoutes');
+const subscriptionPlanRouter = require('./routes/subscriptionPlanRoutes');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -35,6 +36,8 @@ app.use('/api/creations', creationRouter);
 app.use('/api/comments', commentsRouter);
 app.use('/api/likes', likesRouter);
 app.use('/api/followers', followerRouter);
+app.use('/api/plans', subscriptionPlanRouter);
+
 
 // Handling unhandled routes
 app.all('*', (req, res, next) => {
