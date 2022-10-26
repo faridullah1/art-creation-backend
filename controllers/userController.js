@@ -1,5 +1,15 @@
 const User = require('../models/userModel');
 
+exports.me = async (req, res, next) => {
+	const loggedInUser = await User.findOne({ where: { email: req.user.email }});
+
+	res.status(200).json({
+		status: 'success',
+		data: {
+			loggedInUser
+		}
+	});
+};
 
 exports.createUser = async (req, res, next) => {
 	const { email, name } = req.user;

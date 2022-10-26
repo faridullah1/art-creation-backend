@@ -1,8 +1,10 @@
 const superAgent = require('superagent');
 const Creation = require('../models/creationModel');
 const CreationComment = require('../models/creationComments');
+const CreationLike = require('../models/creationLikes');
 const User = require('../models/userModel');
 const db = require('../db');
+
 
 exports.createPrediction = async (req, res, next) => {
 	try {
@@ -75,9 +77,15 @@ exports.getAllCreations = async (req, res, next) => {
 		*/
 		const creations = await Creation.findAll(
 			{ 
-				include: [User, {
+				include: [
+					{ model: User }, 
+					{
 						model: CreationComment,
 						include: User
+					},
+					{ 
+						model: CreationLike, 
+						attributes: ['userId', 'creationId'] 
 					}
 				]
 			}

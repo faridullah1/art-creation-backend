@@ -11,7 +11,9 @@ dotenv.config({ path: './config.env' });
 const userRouter = require('./routes/userRoutes');
 const creationRouter = require('./routes/creationRoutes');
 const commentsRouter = require('./routes/commentsRoutes');
+const likesRouter = require('./routes/likesRoutes');
 const followerRouter = require('./routes/followerRoutes');
+
 const globalErrorHandler = require('./controllers/errorController');
 
 // Db connection
@@ -31,6 +33,7 @@ app.get('/', (req, res) => {
 app.use('/api/users', userRouter);
 app.use('/api/creations', creationRouter);
 app.use('/api/comments', commentsRouter);
+app.use('/api/likes', likesRouter);
 app.use('/api/followers', followerRouter);
 
 // Handling unhandled routes
