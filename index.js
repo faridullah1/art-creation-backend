@@ -14,6 +14,7 @@ const commentsRouter = require('./routes/commentsRoutes');
 const likesRouter = require('./routes/likesRoutes');
 const followerRouter = require('./routes/followerRoutes');
 const subscriptionPlanRouter = require('./routes/subscriptionPlanRoutes');
+const authRouter = require('./routes/authRoutes');
 
 const globalErrorHandler = require('./controllers/errorController');
 
@@ -35,6 +36,7 @@ app.use('/comments', commentsRouter);
 app.use('/likes', likesRouter);
 app.use('/followers', followerRouter);
 app.use('/plans', subscriptionPlanRouter);
+app.use('/auth', authRouter);
 
 
 // Handling unhandled routes
