@@ -1,8 +1,8 @@
 const Sequelize = require('sequelize');
-
-const connection = new Sequelize(process.env.DATABASE, process.env.DATABASE_USER, process.env.USER_PASSWORD, {
-	dialect: process.env.dialect,
-	host: process.env.HOST
+console.log(process.env);
+const connection = new Sequelize(process.env.DATABASE??'ai_art', process.env.DATABASE_USER??'root', process.env.USER_PASSWORD??'mysql', {
+	dialect: process.env.dialect??'mysql',
+	host: process.env.HOST??'mysql'
 });
 
 module.exports = connection;
