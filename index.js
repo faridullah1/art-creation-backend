@@ -27,18 +27,14 @@ if (process.env.NODE_ENV === 'development') {
 	app.use(morgan('dev'));
 }
 
-app.get('/', (req, res) => {
-	res.send('Welcome to Night Cafe Clone App');
-});
-
 app.get('/status', (req, res) => res.send({status: "I'm up and running"}));
 
-app.use('/api/users', userRouter);
-app.use('/api/creations', creationRouter);
-app.use('/api/comments', commentsRouter);
-app.use('/api/likes', likesRouter);
-app.use('/api/followers', followerRouter);
-app.use('/api/plans', subscriptionPlanRouter);
+app.use('/users', userRouter);
+app.use('/creations', creationRouter);
+app.use('/comments', commentsRouter);
+app.use('/likes', likesRouter);
+app.use('/followers', followerRouter);
+app.use('/plans', subscriptionPlanRouter);
 
 
 // Handling unhandled routes
