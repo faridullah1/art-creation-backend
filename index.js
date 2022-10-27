@@ -31,6 +31,8 @@ app.get('/', (req, res) => {
 	res.send('Welcome to Night Cafe Clone App');
 });
 
+app.get('/status', (req, res) => res.send({status: "I'm up and running"}));
+
 app.use('/api/users', userRouter);
 app.use('/api/creations', creationRouter);
 app.use('/api/comments', commentsRouter);
