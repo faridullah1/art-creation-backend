@@ -1,12 +1,12 @@
-const subscriptionPlan = require('../models/subscriptionPlanModel');
+const SubscriptionPlan = require('../models/subscriptionPlanModel');
 
 
 exports.createPlan = async (req, res, next) => {
 	try {
-		const { title, price, coins, benefits } = req.body;
+		const { title, price, coins, benefits, isRecommended } = req.body;
 
-		const plan = await subscriptionPlan.create({
-			title, price, coins,benefits
+		const plan = await SubscriptionPlan.create({
+			title, price, coins, benefits, isRecommended
 		});
 
 		res.status(201).json({
@@ -23,7 +23,7 @@ exports.createPlan = async (req, res, next) => {
 
 exports.getAllPlans = async (req, res, next) => {
 	try {
-		const plans = await subscriptionPlan.findAll();
+		const plans = await SubscriptionPlan.findAll();
 
 		res.status(200).json({
 			status: 'success',
@@ -40,11 +40,11 @@ exports.getAllPlans = async (req, res, next) => {
 exports.updatePlan = async (req, res, next) => {
 	try {
 		const planId = +req.params.id;
-		const plan = await subscriptionPlan.update({ ...req.body }, { where: { planId }});
+		await SubscriptionPlan.update({ ...req.body }, { where: { planId }});
 
 		res.status(200).json({
 			status: 'success',
-			data: plan
+			data: null
 		});
 	}
 	catch(err) {
@@ -55,7 +55,7 @@ exports.updatePlan = async (req, res, next) => {
 exports.deletePlan = async (req, res, next) => {
 	try {
 		const planId = +req.params.id;
-		await subscriptionPlan.destroy({ where: { planId }});
+		await SubscriptionPlan.destroy({ where: { planId }});
 
 		res.status(204).json({
 			status: 'success',

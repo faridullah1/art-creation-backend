@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const db = require('../db');
 
-const subscriptionPlan = db.define('subscription_plan', {
+const SubscriptionPlan = db.define('subscription_plan', {
 	planId: {
 		type: Sequelize.INTEGER,
 		autoIncrement: true,
@@ -23,7 +23,11 @@ const subscriptionPlan = db.define('subscription_plan', {
 	benefits: {
 		type: Sequelize.STRING(1000),
 		allowNull: false
+	},
+	isRecommended: {
+		type: Sequelize.BOOLEAN,
+		defaultValue: false
 	}
 });
 
-module.exports = subscriptionPlan;
+module.exports = SubscriptionPlan;

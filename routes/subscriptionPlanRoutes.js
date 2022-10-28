@@ -1,13 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const subscriptionPlanController = require('../controllers/subscriptionPlanController');
+const { admin } = require('../middleware/admin');
 
 router.route('/')
 	.get(subscriptionPlanController.getAllPlans)
-	.post(subscriptionPlanController.createPlan);
+	.post(admin, subscriptionPlanController.createPlan);
 
 router.route('/:id')
-	.patch(subscriptionPlanController.updatePlan)
-	.delete(subscriptionPlanController.deletePlan);
+	.patch(admin, subscriptionPlanController.updatePlan)
+	.delete(admin, subscriptionPlanController.deletePlan);
 
 module.exports = router;
