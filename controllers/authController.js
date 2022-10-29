@@ -6,7 +6,7 @@ const { AdminUser, validate } = require('../models/adminUserModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
 
-exports.login = catchAsync(async (req, res) => {
+exports.login = catchAsync(async (req, res, next) => {
 	const { error } = validateLogin(req.body);
 	if (error) return next(new AppError(error.message, 400));
 
@@ -25,13 +25,13 @@ exports.login = catchAsync(async (req, res) => {
 	});
 });
 
-exports.signUp = catchAsync(async (req, res) => {
+exports.signUp = catchAsync(async (req, res, next) => {
 	const { error } = validate(req.body);
 	if (error) return next(new AppError(error.message, 400));
 
 	const { name, email, password } = req.body;
 
-	let user = await AdminUser.findOne({ email: req.body.email });
+	let user = await AdminUser.findOne({ where: { email: req.body.email } });
 	if (user) return next(new AppError('User already registered.', 400));
 
 	const admin = await AdminUser.create({
