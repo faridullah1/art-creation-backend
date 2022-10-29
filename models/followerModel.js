@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const Joi = require('joi');
 const db = require('../db');
 const User = require('./userModel');
 
@@ -27,4 +28,13 @@ const Follower = db.define('follower', {
 	}
 });
 
-module.exports = Follower;
+function validateFollower(obj) {
+	const schema = Joi.object({
+		userId: Joi.number().required()
+	});
+
+	return schema.validate(obj);
+}
+
+exports.validate = validateFollower
+exports.Follower = Follower;

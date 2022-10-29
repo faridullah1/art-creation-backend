@@ -1,25 +1,27 @@
-const User = require('../models/userModel');
-const CreationComment = require('../models/creationComments');
+const { User } = require('../models/userModel');
+const { CreationComment, validate } = require('../models/creationComments');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
-exports.createComment = async (req, res, next) => {
-	try {
-		const { comment, creationId } = req.body;
 
-		const user = await User.findOne({ where: { email: req.user.email } });
+exports.createComment = catchAsync(async (req, res, next) => {
+	const { error } = validate(req.body);
+	if (error) return next(new AppError(error.message, 400));
 
-		const resp = await CreationComment.create({
-			comment,
-			creationId,
-			userId: user.userId,
-		});
+	const { comment, creationId } = req.body;
 
-		const data = { ...resp['dataValues'], user };
+	const user = await User.findOne({ where: { email: req.user.email } });
 
-		res.status(201).json({
-			status: 'success',
-			data: data
-		});
-	} catch(err) {
-		res.status(500).send(err);
-	}
-};
+	const resp = await CreationComment.create({
+		comment,
+		creationId,
+		userId: user.userId,
+	});
+
+	const data = { ...resp['dataValues'], user };
+
+	res.status(201).json({
+		status: 'success',
+		data: data
+	});
+});

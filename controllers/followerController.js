@@ -1,84 +1,72 @@
-const Follower = require('../models/followerModel');
-const User = require('../models/userModel');
-const Creation = require('../models/creationModel');
-const CreationComment = require('../models/creationComments');
-const CreationLike = require('../models/creationLikes');
+const { Follower, validate } = require('../models/followerModel');
+const { User } = require('../models/userModel');
+const { Creation } = require('../models/creationModel');
+const { CreationComment } = require('../models/creationComments');
+const { CreationLike } = require('../models/creationLikes');
+const catchAsync = require('../utils/catchAsync');
+const AppError = require('../utils/appError');
 
-exports.createFollower = async (req, res, next) => {
-	try {
-		const followedBy = await User.findOne({ where: { email: req.user.email }});
 
-		const { userId } = req.body;
+exports.createFollower = catchAsync(async (req, res, next) => {
+	const { error } = validate(req.body);
+	if (error) return next(new AppError(error.message, 400));
 
-		if (userId === followedBy.userId) {
-			return res.status(400).json({
-				status: 'error',
-				message: 'You can not follow your self'
-			});
+	const followedBy = await User.findOne({ where: { email: req.user.email }});
+
+	const { userId } = req.body;
+	if (userId === followedBy.userId) return next(new AppError('You can not follow your self'), 400);
+
+	const resp = await Follower.create({
+		userId,
+		followById: followedBy.userId
+	});
+
+	res.status(201).json({
+		status: 'success',
+		data: {
+			resp
 		}
+	});
+});
 
-		const resp = await Follower.create({
-			userId,
-			followById: followedBy.userId
-		});
+exports.getFollowedByCreations = catchAsync(async (req, res, next) => {
+	const { email } = req.user;
+	const ids = await getFollowedUsersIds(email);
 
-		res.status(201).json({
-			status: 'success',
-			data: {
-				resp
-			}
-		});
-	} catch(err) {
-		res.status(500).send(err.message);
-	}
-};
+	const creations = await Creation.findAll(
+		{ 
+			include: [
+				User, 
+				{
+					model: CreationComment,
+					include: User
+				},
+				{
+					model: CreationLike,
+					attributes: ['userId', 'creationId']
+				}
+			],
+			where: { userId: ids }
+		}
+	);
 
-exports.getFollowedByCreations = async (req, res, next) => {
-	try {
-		const { email } = req.user;
-		const ids = await getFollowedUsersIds(email);
+	res.status(200).json({
+		status: 'success',
+		data: {
+			creations
+		}
+	});
+});
 
-		const creations = await Creation.findAll(
-			{ 
-				include: [
-					User, 
-					{
-						model: CreationComment,
-						include: User
-					},
-					{
-						model: CreationLike,
-						attributes: ['userId', 'creationId']
-					}
-				],
-				where: { userId: ids }
-			}
-		);
+exports.getAllFollowedByUsers = catchAsync(async (req, res, next) => {
+	const { email } = req.user;
+	const ids = await getFollowedUsersIds(email);
 
-		res.status(200).json({
-			status: 'success',
-			data: {
-				creations
-			}
-		});
-	} catch(err) {
-		res.status(500).send(err.message);
-	}
-};
-
-exports.getAllFollowedByUsers = async (req, res, next) => {
-	try {
-		const { email } = req.user;
-		const ids = await getFollowedUsersIds(email);
-
-		res.status(200).json({
-			status: 'success',
-			data: ids
-		});
-	} catch(err) {
-		res.status(500).send(err.message);
-	}
-};
+	res.status(200).json({
+		status: 'success',
+		data: ids
+	});
+});
 
 async function getFollowedUsersIds(email) {
 	const loggedInUser = await User.findOne({ where: { email }});

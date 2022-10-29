@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const Sequelize = require('sequelize');
 const db = require('../db');
 
@@ -11,4 +12,14 @@ const CreationLike = db.define('creation_like', {
 	
 });
 
-module.exports = CreationLike;
+function validateLike(obj) {
+	const schema = Joi.object({
+		creationId: Joi.number().required(),
+		userId: Joi.number().required()
+	});
+
+	return schema.validate(obj);
+}
+
+exports.validate = validateLike;
+exports.CreationLike = CreationLike;

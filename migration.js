@@ -1,8 +1,8 @@
 // Models 
-const Creation = require('./models/creationModel');
-const User = require('./models/userModel');
-const CreationComment = require('./models/creationComments');
-const CreationLike = require('./models/creationLikes');
+const { Creation } = require('./models/creationModel');
+const { User } = require('./models/userModel');
+const { CreationComment } = require('./models/creationComments');
+const { CreationLike } = require('./models/creationLikes');
 
 module.exports = function() {
 	User.hasMany(Creation, { constraints: true, OnDelete: 'CASECADE', foreignKey: 'userId' });

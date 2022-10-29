@@ -20,6 +20,7 @@ const globalErrorHandler = require('./controllers/errorController');
 
 // Db connection
 const sequelize = require('./db');
+const AppError = require('./utils/appError');
 
 // setup middlewares
 app.use(express.json());
@@ -38,13 +39,9 @@ app.use('/followers', followerRouter);
 app.use('/plans', subscriptionPlanRouter);
 app.use('/auth', authRouter);
 
-
 // Handling unhandled routes
 app.all('*', (req, res, next) => {
-	res.status(404).json({
-		status: 'failed',
-		message: `Can't find ${req.originalUrl} on this server`
-	});
+	next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
 
 app.use(globalErrorHandler);

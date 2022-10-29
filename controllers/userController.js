@@ -1,6 +1,8 @@
-const User = require('../models/userModel');
+const { User, validate } = require('../models/userModel');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
-exports.me = async (req, res, next) => {
+exports.me = catchAsync(async (req, res, next) => {
 	const loggedInUser = await User.findOne({ where: { email: req.user.email }});
 
 	res.status(200).json({
@@ -9,17 +11,16 @@ exports.me = async (req, res, next) => {
 			loggedInUser
 		}
 	});
-};
+})
 
-exports.createUser = async (req, res, next) => {
+exports.createUser = catchAsync(async (req, res, next) => {
+	const { error } = validate(req.user);
+	if (error) return next(new AppError(error.message, 400));
+
 	const { email, name } = req.user;
 	const user = await User.findOne({ where: { email }});
-	if (user) {
-		return res.status(403).json({
-			status: 'error',
-			message: 'User already exists'	
-		});
-	}
+
+	if (user) return next(new AppError('User already exists', 403));
 
 	const resp = await User.create({
 		email, name
@@ -31,9 +32,9 @@ exports.createUser = async (req, res, next) => {
 			user: resp
 		}
 	});
-};
+});
 
-exports.getAllUsers = async (req, res, next) => {
+exports.getAllUsers = catchAsync(async (req, res, next) => {
 	const users = await User.findAll();
 
 	res.status(200).json({
@@ -42,31 +43,14 @@ exports.getAllUsers = async (req, res, next) => {
 			users
 		}
 	});
-};
+});
 
-exports.getUserById = async (req, res, next) => {
+exports.updateUser = catchAsync(async (req, res, next) => {
 	const userId = req.params.id;
 	const user = await User.findByPk(userId);
 
-	res.status(200).json({
-		status: 'success',
-		data: {
-			user
-		}
-	});
-};
-
-exports.updateUser = async (req, res, next) => {
-	const userId = req.params.id;
-	const user = await User.findByPk(userId);
-
-	if (!user) {
-		return res.status(404).json({
-			status: 'error',
-			message: 'No record found with given Id'
-		});
-	}
-
+	if (!user) return next(new AppError('No record found with given Id', 404));
+	
 	const { email, name } = req.body;
 
 	user.name = name;
@@ -80,18 +64,13 @@ exports.updateUser = async (req, res, next) => {
 			user: updatedUser
 		}
 	});
-};
+});
 
-exports.deleteUser = async (req, res, next) => {
+exports.deleteUser = catchAsync(async (req, res, next) => {
 	const userId = req.params.id;
 	const user = await User.destroy({ where: { userId }});
 
-	if (!user) {
-		return res.status(404).json({
-			status: 'error',
-			message: 'No record found with given Id'
-		});
-	}
+	if (!user) return next(new AppError('No record found with given Id', 404));
 
 	res.status(204).json({
 		status: 'success',
@@ -99,4 +78,4 @@ exports.deleteUser = async (req, res, next) => {
 			user
 		}
 	});
-};
+});

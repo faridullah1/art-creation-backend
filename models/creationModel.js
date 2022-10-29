@@ -1,3 +1,4 @@
+const Joi = require('joi');
 const Sequelize = require('sequelize');
 const db = require('../db');
 
@@ -31,4 +32,14 @@ const Creation = db.define('creation', {
 	}
 });
 
-module.exports = Creation;
+function validateCreation(obj) {
+	const schema = Joi.object({
+		prompt: Joi.string().max(255).required(),
+		modelType: Joi.string().max(55).required()
+	});
+
+	return schema.validate(obj);
+}
+
+exports.validate = validateCreation;
+exports.Creation = Creation;

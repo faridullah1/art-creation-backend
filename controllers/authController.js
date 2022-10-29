@@ -2,17 +2,19 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Joi = require('joi');
 
-const { AdminUser } = require('../models/adminUserModel');
+const { AdminUser, validate } = require('../models/adminUserModel');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
-exports.login = async (req, res) => {
-	const { error } = validate(req.body);
-	if (error) return res.status(400).send(error.message);
+exports.login = catchAsync(async (req, res) => {
+	const { error } = validateLogin(req.body);
+	if (error) return next(new AppError(error.message, 400));
 
 	let user = await AdminUser.findOne({ where: { email: req.body.email } });
-	if (!user) return res.status(400).send('Invalid email or password.');
+	if (!user) return next(new AppError('Invalid email or password.', 400));
 
 	const isValid = await bcrypt.compare(req.body.password, user.password);
-	if (!isValid) return res.status(400).send('Invalid email or password.');
+	if (!isValid) return next(new AppError('Invalid email or password.', 400));
 
 	const token = generateAuthToken(user);
 
@@ -21,16 +23,16 @@ exports.login = async (req, res) => {
 		access_token: token,
 		user
 	});
-}
+});
 
-exports.signUp = async (req, res) => {
+exports.signUp = catchAsync(async (req, res) => {
 	const { error } = validate(req.body);
-	if (error) return res.status(400).send(error.message);
+	if (error) return next(new AppError(error.message, 400));
 
 	const { name, email, password } = req.body;
 
 	let user = await AdminUser.findOne({ email: req.body.email });
-	if (user) return res.status(400).send('User already registered.');
+	if (user) return next(new AppError('User already registered.', 400));
 
 	const admin = await AdminUser.create({
 		name, email, password
@@ -53,8 +55,7 @@ exports.signUp = async (req, res) => {
 			email: admin.email
 		}
 	});
-}
-
+});
 
 function generateAuthToken(user) {
 	return jwt.sign({ id: user.id, name: user.name, email: user.email }, process.env.JWT_PRIVATE_KEY, {
@@ -62,7 +63,7 @@ function generateAuthToken(user) {
 	});
 }
 
-function validate(req) {
+function validateLogin(req) {
 	const schema = Joi.object({
 		email: Joi.string().email().min(3).max(255).required(),
 		password: Joi.string().min(10).required()

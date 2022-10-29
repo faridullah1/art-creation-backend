@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const AppError = require('../utils/appError');
 
 exports.admin = (req, res, next) => {
 	let token = '';
@@ -7,7 +8,7 @@ exports.admin = (req, res, next) => {
 		token = req.header('Authorization').split(' ')[1];
 	}
 
-	if (!token) return res.status(401).send('Access denied. No token provided.');
+	if (!token) return next(new AppError('Access denied. No token provided.'), 401);
 
 	try {
 		const decodedToken = jwt.verify(token, process.env.JWT_PRIVATE_KEY);
@@ -17,6 +18,6 @@ exports.admin = (req, res, next) => {
 		next();
 	}
 	catch(err) {
-		res.status(400).send('Invalid Token.');
+		return next(new AppError('Invalid Token.'), 400);
 	}
 };

@@ -1,4 +1,5 @@
 const Sequelize = require('sequelize');
+const Joi = require('joi');
 const db = require('../db');
 
 const SubscriptionPlan = db.define('subscription_plan', {
@@ -30,4 +31,17 @@ const SubscriptionPlan = db.define('subscription_plan', {
 	}
 });
 
-module.exports = SubscriptionPlan;
+function validatePlan(plan) {
+	const schema = Joi.object({
+		title: Joi.string().min(3).max(255).required(),
+		price: Joi.number().required(),
+		coins: Joi.number().required(),
+		benefits: Joi.string().required().max(1000),
+		isRecommended: Joi.boolean()
+	});
+
+	return schema.validate(plan);
+}
+
+exports.validate = validatePlan;
+exports.SubscriptionPlan = SubscriptionPlan;

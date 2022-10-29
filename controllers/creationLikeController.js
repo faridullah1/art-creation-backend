@@ -1,38 +1,46 @@
-const User = require('../models/userModel');
-const CreationLike = require('../models/creationLikes');
+const Joi = require('joi');
 
-exports.likeCreation = async (req, res, next) => {
-	try {
-		const { creationId } = req.body;
+const { User } = require('../models/userModel');
+const { CreationLike, validate } = require('../models/creationLikes');
+const catchAsync = require('../utils/catchAsync');
 
-		const user = await User.findOne({ where: { email: req.user.email } });
+exports.likeCreation = catchAsync(async (req, res, next) => {
+	const { error } = validateLike(req.body);
+	if (error) return next(new AppError(error.message, 400));
 
-		const userLike = await CreationLike.create({
-			creationId,
-			userId: user.userId,
-		});
+	const { creationId } = req.body;
+	const user = await User.findOne({ where: { email: req.user.email } });
 
-		res.status(201).json({
-			status: 'success',
-			data: {
-				userLike
-			}
-		});
-	} catch(err) {
-		res.status(500).send(err);
-	}
-};
+	const userLike = await CreationLike.create({
+		creationId,
+		userId: user.userId,
+	});
 
-exports.unLikeCreation = async (req, res, next) => {
-	try {
-		const { creationId, userId } = req.body;
-		await CreationLike.destroy({ where: { userId, creationId }});
+	res.status(201).json({
+		status: 'success',
+		data: {
+			userLike
+		}
+	});
+});
 
-		res.status(204).json({
-			status: 'success',
-			data: null
-		});
-	} catch(err) {
-		res.status(500).send(err.message);
-	}
-};
+exports.unLikeCreation = catchAsync(async (req, res, next) => {
+	const { error } = validate(req.body);
+	if (error) return next(new AppError(error.message, 400));
+
+	const { creationId, userId } = req.body;
+	await CreationLike.destroy({ where: { userId, creationId }});
+
+	res.status(204).json({
+		status: 'success',
+		data: null
+	});
+});
+
+function validateLike(obj) {
+	const schema = Joi.object({
+		creationId: Joi.number().required()
+	});
+
+	return schema.validate(obj);
+}

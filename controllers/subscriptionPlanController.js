@@ -1,68 +1,53 @@
-const SubscriptionPlan = require('../models/subscriptionPlanModel');
+const { SubscriptionPlan, validate } = require('../models/subscriptionPlanModel');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
 
 
-exports.createPlan = async (req, res, next) => {
-	try {
-		const { title, price, coins, benefits, isRecommended } = req.body;
+exports.createPlan = catchAsync(async (req, res, next) => {
+	const { error } = validate(req.body);
+	if (error) return next(new AppError(error.message), 400);
 
-		const plan = await SubscriptionPlan.create({
-			title, price, coins, benefits, isRecommended
-		});
+	const { title, price, coins, benefits, isRecommended } = req.body;
 
-		res.status(201).json({
-			status: 'success',
-			data: {
-				plan
-			}
-		});
-	}
-	catch(err) {
-		res.status(500).send(err);
-	}
-};
+	const plan = await SubscriptionPlan.create({
+		title, price, coins, benefits, isRecommended
+	});
 
-exports.getAllPlans = async (req, res, next) => {
-	try {
-		const plans = await SubscriptionPlan.findAll();
+	res.status(201).json({
+		status: 'success',
+		data: {
+			plan
+		}
+	});
+})
 
-		res.status(200).json({
-			status: 'success',
-			data: {
-				plans
-			}
-		});
-	}
-	catch(err) {
-		res.status(500).send(err);
-	}
-};
+exports.getAllPlans = catchAsync(async (req, res, next) => {
+	const plans = await SubscriptionPlan.findAll();
 
-exports.updatePlan = async (req, res, next) => {
-	try {
-		const planId = +req.params.id;
-		await SubscriptionPlan.update({ ...req.body }, { where: { planId }});
+	res.status(200).json({
+		status: 'success',
+		data: {
+			plans
+		}
+	});
+});
 
-		res.status(200).json({
-			status: 'success',
-			data: null
-		});
-	}
-	catch(err) {
-		res.status(500).send(err);
-	}
-};
+exports.updatePlan = catchAsync(async (req, res, next) => {
+	const planId = +req.params.id;
+	await SubscriptionPlan.update({ ...req.body }, { where: { planId }});	
+	
+	res.status(200).json({
+		status: 'success',
+		data: null
+	});
+});
 
-exports.deletePlan = async (req, res, next) => {
-	try {
-		const planId = +req.params.id;
-		await SubscriptionPlan.destroy({ where: { planId }});
+exports.deletePlan = catchAsync(async (req, res, next) => {
+	const planId = +req.params.id;
+	await SubscriptionPlan.destroy({ where: { planId }});
 
-		res.status(204).json({
-			status: 'success',
-			data: null
-		});
-	}
-	catch(err) {
-		res.status(500).send(err);
-	}
-};
+	res.status(204).json({
+		status: 'success',
+		data: null
+	});
+})
