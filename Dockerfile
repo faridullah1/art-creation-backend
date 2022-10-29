@@ -24,6 +24,7 @@ ARG HOST=mysql
 ENV HOST=${HOST}
 ARG DIALECT=mysql
 ENV DIALECT=${DIALECT}
+
 EXPOSE ${PORT}
 
 CMD ["npm", "start"]
