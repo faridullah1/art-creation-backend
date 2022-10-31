@@ -14,9 +14,6 @@ exports.me = catchAsync(async (req, res, next) => {
 })
 
 exports.createUser = catchAsync(async (req, res, next) => {
-	const { error } = validate(req.user);
-	if (error) return next(new AppError(error.message, 400));
-
 	const { email, name } = req.user;
 	const user = await User.findOne({ where: { email }});
 
