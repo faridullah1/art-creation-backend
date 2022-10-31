@@ -1,7 +1,7 @@
 const Sequelize = require('sequelize');
 const Joi = require('joi');
 const db = require('../db');
-const User = require('./userModel');
+const { User } = require('./userModel');
 
 const Follower = db.define('follower', {
 	id: {
