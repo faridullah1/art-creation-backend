@@ -73,6 +73,8 @@ exports.getAllCreations = catchAsync(async (req, res, next) => {
 				{ model: User }, 
 				{
 					model: CreationComment,
+					limit: 2,
+					offset: 0,
 					include: User
 				},
 				{ 
@@ -93,6 +95,11 @@ exports.getAllCreations = catchAsync(async (req, res, next) => {
 
 exports.getLoggedInUserCreations = catchAsync(async (req, res, next) => {
 	const status = req.query.status;
+
+	const page = parseInt(req.query.page || 1, 10);
+	const limit = parseInt(req.query.limit || 10, 10);
+
+	const offset = (page - 1) * limit;
 	
 	const where = {};
 	if (status !== 'Default') where.status = status;
@@ -100,10 +107,11 @@ exports.getLoggedInUserCreations = catchAsync(async (req, res, next) => {
 	const user = await User.findOne({ where: { email: req.user.email } });
 	where.userId = user.userId;
 
-	const creations = await Creation.findAll({ where });
+	const { rows: creations, count: totalRecords } = await Creation.findAndCountAll({ where, offset, limit });
 
 	res.status(200).json({
 		status: 'success',
+		totalRecords,
 		data: {
 			creations
 		}
