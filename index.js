@@ -1,8 +1,10 @@
 // 3rd party packages
 const express = require('express');
-const app = express();
+const cors = require('cors');
 const dotenv = require('dotenv');
 const morgan = require('morgan');
+
+const app = express();
 
 // Setup enviroment variables
 dotenv.config({ path: './config.env' });
@@ -23,6 +25,10 @@ const sequelize = require('./db');
 const AppError = require('./utils/appError');
 
 // setup middlewares
+app.use(cors({
+	origin: 'https://admin.talkart.io/',
+	optionsSuccessStatus: true
+}));
 app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {
