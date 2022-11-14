@@ -25,10 +25,12 @@ const sequelize = require('./db');
 const AppError = require('./utils/appError');
 
 // setup middlewares
-app.use(cors({
-	origin: 'https://admin.talkart.io/',
-	optionsSuccessStatus: true
-}));
+const corsOptions = {
+	origin: 'https://admin.talkart.io/'
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {
